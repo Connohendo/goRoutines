@@ -28,6 +28,10 @@ func main() {
 		if userInputLower == "no" {
 			break
 		}
+		if userInputLower != "yes" && userInputLower != "no" {
+			fmt.Println("Please enter yes or no")
+			continue
+		}
 		<-channel
 	}
 }
