@@ -3,36 +3,36 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
-	//var userInput string
-	fortune := make(chan string)
+	var userInput string
+	channel := make(chan string)
 
-	go fortunes(fortune)
+	go fortunes(channel)
 
 	for {
-		reader := bufio.NewReader(os.Stdin)
 		fmt.Println("Do you want a fortune?")
-		userInput, _ := reader.ReadString('\n')
-		strings.ToLower(userInput)
-		fmt.Println("here is your user input: " + userInput)
+		fmt.Scanf("%s", &userInput)
 
-		if userInput == "yes" {
-			fmt.Println("you made it to yes")
-			//fortune <- "yes"
+		userInputLower := strings.ToLower(userInput)
+
+		if userInputLower == "yes" {
+			channel <- "yes"
 		}
-		if userInput == "no" {
-			return
+		if userInputLower == "no" {
+			break
 		}
+		<-channel
 	}
 }
 
-func fortunes(fortune chan string) {
+func fortunes(channel chan string) {
 
 	dat, err := os.ReadFile("Fortunes.txt")
 	check(err)
@@ -40,8 +40,12 @@ func fortunes(fortune chan string) {
 	slices := strings.Split(string(dat), "%%")
 
 	for {
-		<-fortune
-		fmt.Println(slices[1])
+		<-channel
+
+		rand.Seed(time.Now().Unix())
+		fmt.Println(slices[rand.Intn(len(slices))])
+
+		channel <- "done"
 	}
 }
 
