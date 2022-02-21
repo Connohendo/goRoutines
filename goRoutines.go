@@ -3,25 +3,31 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
 )
 
 func main() {
-	var userInput string
+	//var userInput string
 	fortune := make(chan string)
 
 	go fortunes(fortune)
 
 	for {
-
+		reader := bufio.NewReader(os.Stdin)
 		fmt.Println("Do you want a fortune?")
-		fmt.Scanf(userInput)
+		userInput, _ := reader.ReadString('\n')
 		strings.ToLower(userInput)
+		fmt.Println("here is your user input: " + userInput)
 
 		if userInput == "yes" {
-			fortune <- "yes"
+			fmt.Println("you made it to yes")
+			//fortune <- "yes"
+		}
+		if userInput == "no" {
+			return
 		}
 	}
 }
@@ -34,15 +40,8 @@ func fortunes(fortune chan string) {
 	slices := strings.Split(string(dat), "%%")
 
 	for {
-
-		select {
-		case x, ok := <-fortune:
-			if ok {
-				fmt.Println("Value %d was read.\n", x)
-			}
-		default:
-			fmt.Println("No value ready, moving on.")
-		}
+		<-fortune
+		fmt.Println(slices[1])
 	}
 }
 
